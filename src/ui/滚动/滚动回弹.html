@@ -1,0 +1,119 @@
+<!--
+  onTouchStart记录初始位置
+  onTouchMove 获取当前拉动的差值，赋值给transform
+  onTouchEnd 改变flag, 在wathch等监听函数进行回弹
+
+  petite貌似无法用watch
+  -->
+
+<script type="module">
+  import { createApp, reactive } from 'https://unpkg.com/petite-vue?module'
+  console.log('reactive', reactive)
+  function useTouch() {
+    const state = reactive({
+      startX: 0,
+      startY: 0,
+      deltaX: 0,
+      deltaY: 0,
+      offsetX: 0,
+      offsetY: 0,
+    })
+
+    const reset = () => {
+      state.startX = 0
+      state.startY = 0
+      state.deltaX = 0
+      state.deltaY = 0
+      state.offsetX = 0
+      state.offsetY = 0
+    }
+
+    const start = (event) => {
+      reset()
+      const [{ clientX, clientY }] = event.touches
+      state.startX = clientX
+      state.startY = clientY
+    }
+
+    const move = (event) => {
+      const [touch] = event.touches
+      // Fix: Safari back will set clientX to negative number
+      state.deltaX = touch.clientX < 0 ? 0 : touch.clientX - state.startX
+      state.deltaY = touch.clientY - state.startY
+      state.offsetX = Math.abs(state.deltaX)
+      state.offsetY = Math.abs(state.deltaY)
+    }
+
+    return {
+      state,
+      move,
+      start,
+    }
+  }
+
+  const touch = useTouch()
+  createApp({
+    distance: 0,
+    emitEnd: false,
+    trackStyle: {},
+    mounted() {
+      console.log('this.scroll', this.scroll)
+    },
+    getScrollTop(el) {
+      const top = 'scrollTop' in el ? window.scrolltop : el.pageYOffset
+    },
+    onTouchMove(e) {
+      const y = touch.state.deltaY
+      touch.move(e)
+      console.log(y)
+      this.distance = y
+      const trackStyle = {
+        transitionDuration: `${300}ms`,
+        transform: `translate3d(0,${this.distance}px, 0)`,
+      }
+      this.trackStyle = trackStyle
+    },
+    onTouchStart(e) {
+      touch.start(e)
+    },
+    onTouchEnd() {
+      this.distance += 50
+      this.emitEnd = true
+    },
+    test() {
+      if (this.distance > 0 && this.emitEnd) {
+        console.log(22222)
+        this.distance -= 50
+      }
+    },
+  }).mount()
+</script>
+
+<title>滚动回弹</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<div
+  ref="scroll"
+  @mounted="mounted"
+  @touchStart="onTouchStart"
+  @touchmove="onTouchMove"
+  @touchend="onTouchEnd"
+  class="scroll-view"
+  :style="trackStyle"
+  v-effect="test(distance)"
+  v-scope
+>
+  <div class="scroll-view-item" v-for="n in 10">{{n}}</div>
+</div>
+
+<style>
+  .scroll-view {
+    height: 40vh;
+  }
+
+  .scroll-view-item {
+    padding: 20px 0;
+    text-align: center;
+    font-size: 28px;
+    border-bottom: 0.5px solid #efefef;
+  }
+</style>

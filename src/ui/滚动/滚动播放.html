@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/petite-vue" defer init></script>
+    <style>
+      ul {
+        list-style: none;
+        margin: 0;
+      }
+      .horizontal-wrapper {
+        width: 291px;
+        background: rgba(89, 158, 248, 0.08);
+        line-height: 32px;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .horizontal-scroll {
+        padding-left: 100%;
+        animation: horizontal-scroll linear 6s infinite both;
+      }
+
+      .horizontal-scroll:hover {
+        animation-play-state: paused;
+      }
+
+      @keyframes horizontal-scroll {
+        from {
+          transform: translate(0);
+        }
+
+        to {
+          transform: translate(-100%);
+        }
+      }
+
+      .vertical-wrapper {
+        height: 100px;
+        overflow: hidden;
+        background: #f7f7f7;
+      }
+
+      .vertical-item {
+        line-height: 26px;
+      }
+      .vertical-scroll {
+        animation: 15s vertical-scroll linear infinite;
+      }
+      @keyframes vertical-scroll {
+        from {
+        }
+        to {
+          transform: translateY(-260px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h2>水平滚动</h2>
+    <div class="horizontal-wrapper">
+      <div class="horizontal-scroll">
+        为了确保您的资金安全，请设置支付密码为了确保您的资金安全，请设置支付密码为了确保您的资金安全，请设置支付密码
+      </div>
+    </div>
+
+    <h2>垂直滚动</h2>
+    <div class="vertical-wrapper" v-scope>
+      <ul class="vertical-scroll">
+        <li class="vertical-item" v-for="n in 10">{{n}}</li>
+      </ul>
+      <!-- 需要重复或者多一个ul作为无缝连接 -->
+      <ul class="vertical-scroll">
+        <li class="vertical-item" v-for="n in 10">{{n}}</li>
+      </ul>
+    </div>
+  </body>
+</html>
